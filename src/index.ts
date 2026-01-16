@@ -20,8 +20,8 @@ const encode = (input: string) => {
 };
 
 // แปลงค่าที่ encode เอาไว้กลับไปเป็น jinja syntax
-export const decode = (input: string) => {
-  return input.replaceAll(ORBIT_EXPR_REGEX, (_, capture) => {
+export const decode = <T>(input: T) => {
+  return String(input).replaceAll(ORBIT_EXPR_REGEX, (_, capture) => {
     return fromHex(capture);
   });
 };
@@ -111,7 +111,6 @@ export type OrbitMatchState = {
   statements: any[];
 };
 
-// TODO: else condition and fix on jsx render
 export const match = <T>(value: OrbitValue<T>, state: OrbitMatchState = { statements: [] }) => {
   const render = () => {
     if (state.statements.length) {
@@ -174,18 +173,18 @@ export const match = <T>(value: OrbitValue<T>, state: OrbitMatchState = { statem
   };
 };
 
-/** @description helper function สำหรับครอบ {{ ... }} สำหรับ HTML attribute และ innerHTML */
-export const e = <T>(value: OrbitValue<T>) => {
-  return encode(`{{ ${String(value)} }}`);
+/** @description helper function สำหรับครอบ {{ ... }} สำหรับ HTML attribute, innerHTML, JSON value, หรือ JSX Prop โดยที่จะหลอก IDE ว่าคืนค่า type เดิมกลับไป (ถ้าใช้เป็น JSX Prop ไม่ควรนำค่านั้นไปใช้คำนวณหรือเช็คเงื่อนไขต่างๆ ในช่วง prerender เพราะค่ามันจะไม่ใช่ value จริงๆ) */
+export const e = <T>(value: OrbitValue<T>): T => {
+  return encode(`{{ ${String(value)} }}`) as T;
 };
 
 /** @description helper function สำหรับครอบ "" และ {{ ... }} สำหรับ JSON value ที่เป็น string */
-export const q = (value: OrbitValue<string>) => {
+export const q = (value: OrbitValue<string>): string => {
   return encode(`"{{ ${String(value)} }}"`);
 };
 
 /** @description helper function สำหรับครอบ {% ... %} ส่วน value อยากใส่อะไรก็ใส่ */
-export const b = (value: `if ${string}` | `elif ${string}` | "else" | "endif") => {
+export const b = (value: `if ${string}` | `elif ${string}` | "else" | "endif"): string => {
   return encode(`{% ${value} %}`);
 };
 
