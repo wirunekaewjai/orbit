@@ -1,14 +1,12 @@
-# orbit
+# pin
 
 โปรเจกต์นี้เริ่มมาจากการฝึกพัฒนาเว็บไซต์ด้วยภาษา **Rust** โดยในช่วงแรกนั้นใช้ [Askama](https://github.com/askama-rs/askama) ในการแสดงผล HTML ซึ่งทำให้ได้ศึกษาการเขียน Jinja Syntax ลงบนไฟล์ HTML อย่างไรก็ตาม ด้วยความคุ้นชินจากการพัฒนา UI ด้วย JSX/TSX จึงเกิดแนวคิดในการเชื่อมต่อทั้งสองฝั่งเข้าด้วยกัน คือการพัฒนา Core logic ด้วย Rust และออกแบบ UI ด้วยความคล่องตัวของ JSX
-
-**orbit** จึงถูกพัฒนาขึ้นเพื่อเป็น minimalist type-safe bridge สำหรับเขียน Jinja template ผ่านไฟล์ TSX โดยตรง ช่วยรักษาความถูกต้องของ Type และแก้ไขปัญหาการถูกแทรกแซง (escape) syntax โดย JSX runtime
 
 ---
 
 ## ปรัชญาการออกแบบ (Design Philosophy)
 
-**orbit** ถูกออกแบบโดยยึดถือหลักความเรียบง่าย (Simplicity) เป็นสำคัญ เพื่อทำหน้าที่เป็นเพียง "สะพานเชื่อม" ระหว่างสองระบบเท่านั้น โดยมีข้อกำหนดขอบเขตดังนี้:
+**pin** ถูกออกแบบโดยยึดถือหลักความเรียบง่าย (Simplicity) เป็นสำคัญ เพื่อทำหน้าที่เป็นเพียง "สะพานเชื่อม" ระหว่างสองระบบเท่านั้น โดยมีข้อกำหนดขอบเขตดังนี้:
 
 * **Minimalist Bridge:** โฟกัสเฉพาะการส่งต่อข้อมูลและโครงสร้างพื้นฐาน ไม่มีการเพิ่มฟีเจอร์ซับซ้อนของ Jinja เช่น `filter`, `macro`, `extends` หรือ `include`
 * **Server-Side Logic:** ในกรณีที่มีลอจิกที่ซับซ้อน แนะนำให้ดำเนินการให้เสร็จสิ้นที่ฝั่ง Server (เช่น ในโค้ด Rust) ก่อนจะส่งค่ามายัง Template เพื่อรักษาความสะอาดของ UI Code
@@ -31,7 +29,7 @@
 สร้าง object ที่เป็นตัวแทนของข้อมูลใน Jinja โดยอ้างอิงโครงสร้างจาก Interface
 
 ```typescript
-import { proxy, e, decode } from "orbit";
+import { proxy, e, decode } from "pin";
 
 interface Post {
   id: number;
@@ -49,7 +47,7 @@ const post = proxy<Post>();
 ใช้กลุ่มฟังก์ชัน helper เพื่อสร้าง syntax ของ Jinja ภายในโครงสร้าง JSX
 
 ```tsx
-import { map, match, e } from "orbit";
+import { map, match, e } from "pin";
 
 const PostTemplate = () => (
   <article>
@@ -77,7 +75,7 @@ const PostTemplate = () => (
 ในกรณีที่ต้องการควบคุม Logic แบบ Manual สามารถใช้ฟังก์ชัน `b()` (Block) ได้:
 
 ```tsx
-import { b, proxy } from 'orbit';
+import { b, proxy } from 'pin';
 
 const user = proxy<{ isLoggedIn: boolean; role: string }>();
 
@@ -108,7 +106,7 @@ const Header = () => (
 
 ```tsx
 import { renderToString } from 'react-dom/server';
-import { decode } from 'orbit';
+import { decode } from 'pin';
 
 const html = renderToString(<Header />);
 const finalJinja = decode(html); 
